@@ -1,0 +1,14 @@
+from environs import Env
+
+env = Env()
+env.read_env()
+
+BOT_TOKEN = env.str("BOT_TOKEN")
+ADMINS = env.list("ADMINS")
+
+
+CHANNEL_URL = env.str("CHANNEL_URL")
+CHANNEL_ID = env.str("CHANNEL_ID")
+CHANNEL = [
+    {'name': "Channel 🌐", "url": CHANNEL_URL, "id": CHANNEL_ID},
+]
