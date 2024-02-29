@@ -23,11 +23,11 @@ class DatabaseManager:
                 id INTEGER PRIMARY KEY,
                 teacher TEXT,
                 subject TEXT,
-                test_number INTEGER PRIMARY KEY,
+                test_number INTEGER,
                 quantity_questions INTEGER,
                 all_answers TEXT,
                 total_score INTEGER,
-                status BOOLEAN,               
+                status BOOLEAN
             )
             """
         )
@@ -38,12 +38,12 @@ class DatabaseManager:
                 id INTEGER PRIMARY KEY,
                 user_id INTEGER,
                 test_id INTEGER,
-                FOREIGN KEY (user_id) REFERENCES users (id),
-                FOREIGN KEY (test_id) REFERENCES tests (id),
                 sent_answers TEXT,
                 correct_answers TEXT,
                 total_score INTEGER,
-                persentage INTEGER
+                persentage INTEGER,
+                FOREIGN KEY (user_id) REFERENCES users (id),
+                FOREIGN KEY (test_id) REFERENCES tests (id)
             )
             """
         )
@@ -65,4 +65,3 @@ class DatabaseManager:
             f"INSERT INTO tests (teacher, subject, test_number, quantity_questions, all_answers, total_score, status) VALUES ('{teacher}', '{subject}', {test_number}, {quantity_questions}, '{all_answers}', {total_score}, {status})"
         )
         self.conn.commit()
-
