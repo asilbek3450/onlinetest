@@ -62,6 +62,24 @@ class DatabaseManager:
 
     def add_test(self, teacher, subject, test_number, quantity_questions, all_answers, total_score, status):
         self.cursor.execute(
-            f"INSERT INTO tests (teacher, subject, test_number, quantity_questions, all_answers, total_score, status) VALUES ('{teacher}', '{subject}', {test_number}, {quantity_questions}, '{all_answers}', {total_score}, {status})"
+            f"INSERT INTO tests (teacher, subject, test_number, quantity_questions, all_answers, total_score, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (teacher, subject, test_number, quantity_questions, all_answers, total_score, status)
         )
         self.conn.commit()
+
+    def get_test_by_test_number(self, test_number):
+        return self.cursor.execute(f"SELECT * FROM tests WHERE test_number = {test_number}").fetchone()
+
+    def clear_table(self, table_name):
+        self.cursor.execute(f"DELETE FROM {table_name}")
+        self.conn.commit()
+
+    def get_current_test_id(self):
+        last_id = self.cursor.execute("SELECT id FROM tests ORDER BY id DESC LIMIT 1").fetchone()
+        if last_id:
+            return last_id[0]
+        else:
+            return '0'
+
+    def close(self):
+        self.conn.close()

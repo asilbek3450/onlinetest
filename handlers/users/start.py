@@ -9,7 +9,7 @@ from utils.check_start_users import is_user_joined_to_channel
 
 @dp.message_handler(CommandStart())
 async def bot_start(message: types.Message):
-    if await bot.get_chat_member(chat_id=CHANNEL_ID, user_id=message.from_user.id):
+    if await is_user_joined_to_channel(user_id=message.from_user.id):
         await message.answer(f"Bo'limlardan birini tanlang.", reply_markup=menu_kb)
     else:
         await message.answer(f"Assalomu alaykum {message.from_user.full_name}!\n"
