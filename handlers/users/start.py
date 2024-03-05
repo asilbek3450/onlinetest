@@ -1,13 +1,13 @@
 from aiogram import types
 from aiogram.dispatcher.filters.builtin import CommandStart
 
-from data.config import CHANNEL_ID
 from keyboards.inline.start import start_kb, menu_kb
 from loader import dp, bot
 from utils.check_start_users import is_user_joined_to_channel
+from utils.db_api.database import DatabaseManager
 
 
-@dp.message_handler(CommandStart())
+@dp.message_handler(CommandStart(), state="*")
 async def bot_start(message: types.Message):
     if await is_user_joined_to_channel(user_id=message.from_user.id):
         await message.answer(f"Bo'limlardan birini tanlang.", reply_markup=menu_kb)
@@ -16,7 +16,7 @@ async def bot_start(message: types.Message):
                              f"Botdan foydalanish uchun quyidagi kanallarga a'zo bo'ling 👇\n\n", reply_markup=start_kb)
 
 
-@dp.callback_query_handler(text="check_channel")
+@dp.callback_query_handler(text="check_channel", state="*")
 async def check_channel(call: types.CallbackQuery):
     if await is_user_joined_to_channel(call.from_user.id):
         await call.message.edit_text("Tabriklayman! Siz kanalga a'zo bo'libsiz! Bo'limlardan birini tanlang.", reply_markup=menu_kb)

@@ -67,8 +67,31 @@ class DatabaseManager:
         )
         self.conn.commit()
 
+    def add_user_test_connection(self, user_id, test_id, sent_answers, correct_answers, total_score, persentage):
+        self.cursor.execute(
+            f"INSERT INTO user_test_connection (user_id, test_id, sent_answers, correct_answers, total_score, persentage) VALUES (?, ?, ?, ?, ?, ?)",
+            (user_id, test_id, sent_answers, correct_answers, total_score, persentage)
+        )
+        self.conn.commit()
+
+    def get_user_by_id(self, user_id):
+        return self.cursor.execute(f"SELECT * FROM users WHERE id = {user_id}").fetchone()
+
+    def get_user_by_full_name(self, full_name):
+        return self.cursor.execute(f"SELECT * FROM users WHERE full_name = '{full_name}'").fetchone()
+
+    def get_user_test_connection_by_test_id(self, test_id):
+        return self.cursor.execute(f"SELECT * FROM user_test_connection WHERE test_id = {test_id}").fetchall()
+
+    def is_user_test_connection_exists(self, user_id, test_id):
+        return self.cursor.execute(f"SELECT * FROM user_test_connection WHERE user_id. = {user_id} AND test_id = {test_id}").fetchone()
+
     def get_test_by_test_number(self, test_number):
         return self.cursor.execute(f"SELECT * FROM tests WHERE test_number = {test_number}").fetchone()
+
+    def update_test_status(self, test_number, status):
+        self.cursor.execute(f"UPDATE tests SET status = {status} WHERE test_number = {test_number}")
+        self.conn.commit()
 
     def clear_table(self, table_name):
         self.cursor.execute(f"DELETE FROM {table_name}")
