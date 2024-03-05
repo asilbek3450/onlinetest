@@ -1,11 +1,3 @@
-# id
-# teacher
-# subject
-# test_number
-# quantity_questions
-# all_answers
-# total_score
-# status
 import re
 from datetime import datetime
 
