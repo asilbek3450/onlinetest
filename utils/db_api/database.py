@@ -43,7 +43,8 @@ class DatabaseManager:
                 total_score INTEGER,
                 persentage INTEGER,
                 FOREIGN KEY (user_id) REFERENCES users (id),
-                FOREIGN KEY (test_id) REFERENCES tests (id)
+                FOREIGN KEY (test_id) REFERENCES tests (id),
+                unique (user_id, test_id)
             )
             """
         )
@@ -77,6 +78,9 @@ class DatabaseManager:
     def get_user_by_id(self, user_id):
         return self.cursor.execute(f"SELECT * FROM users WHERE id = {user_id}").fetchone()
 
+    def get_user_by_user_id(self, user_id):
+        return self.cursor.execute(f"SELECT * FROM users WHERE user_id = {user_id}").fetchone()
+
     def get_user_by_full_name(self, full_name):
         return self.cursor.execute(f"SELECT * FROM users WHERE full_name = '{full_name}'").fetchone()
 
@@ -84,7 +88,7 @@ class DatabaseManager:
         return self.cursor.execute(f"SELECT * FROM user_test_connection WHERE test_id = {test_id}").fetchall()
 
     def is_user_test_connection_exists(self, user_id, test_id):
-        return self.cursor.execute(f"SELECT * FROM user_test_connection WHERE user_id. = {user_id} AND test_id = {test_id}").fetchone()
+        return self.cursor.execute(f"SELECT * FROM user_test_connection WHERE user_id = {user_id} AND test_id = {test_id}").fetchone()
 
     def get_test_by_test_number(self, test_number):
         return self.cursor.execute(f"SELECT * FROM tests WHERE test_number = {test_number}").fetchone()
