@@ -132,4 +132,4 @@ dmypy.json
 
 *.db
 *.sqlite3
-.online_test.db
+online_test.db

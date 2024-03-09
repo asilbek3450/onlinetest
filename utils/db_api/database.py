@@ -81,8 +81,9 @@ class DatabaseManager:
     def get_user_by_user_id(self, user_id):
         return self.cursor.execute(f"SELECT * FROM users WHERE user_id = {user_id}").fetchone()
 
-    def get_user_by_full_name(self, full_name):
-        return self.cursor.execute(f"SELECT * FROM users WHERE full_name = '{full_name}'").fetchone()
+    def update_user_full_name(self, user_id, full_name):
+        self.cursor.execute(f"UPDATE users SET full_name = '{full_name}' WHERE user_id = {user_id}")
+        self.conn.commit()
 
     def get_user_test_connection_by_test_id(self, test_id):
         return self.cursor.execute(f"SELECT * FROM user_test_connection WHERE test_id = {test_id}").fetchall()

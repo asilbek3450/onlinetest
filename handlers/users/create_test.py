@@ -3,7 +3,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.types import ReplyKeyboardRemove
 from keyboards.inline.start import create_test_kb, check_test_kb, menu_kb, active_test_kb
-from loader import dp
+from loader import dp, bot
 from utils.regex_test import regex_create_test, regex_check_test
 from utils.test_fields import generate_test_number, match_user_answers, calculate_score
 from loader import db_manager
@@ -40,9 +40,12 @@ async def create_test(message: types.Message, state: FSMContext):
     full_name, subject, user_answers = await regex_create_test(message.text)
     quantity_questions, all_answers = await match_user_answers(user_answers)
     total_score = quantity_questions * 10
+    all_answers_str = ""
+    for i in all_answers:
+        all_answers_str += f"{all_answers[i]}"
 
     test_number = generate_test_number(db_manager.get_current_test_id())
-    db_manager.add_test(full_name, subject, test_number, quantity_questions, all_answers, total_score, status=True)
+    db_manager.add_test(full_name, subject, test_number, quantity_questions, all_answers_str, total_score, status=True)
     new_test = db_manager.get_test_by_test_number(test_number)
     await state.update_data(active_test_number=new_test[3])
     await TestCreationStates.next()
@@ -65,6 +68,17 @@ async def finish_test(call: types.CallbackQuery, state: FSMContext):
     test = db_manager.get_test_by_test_number(state_data["active_test_number"])
     db_manager.update_test_status(test[3], status=False)
     await state.finish()
+
+    checked_users = db_manager.get_user_test_connection_by_test_id(test[3])
+    for i in checked_users:
+        user = db_manager.get_user_by_id(i[1])
+        message_text = f"❗ Diqqat!\n\n" \
+                       f"⛔ Test yakunlandi!\n" \
+                       f"Test kodi: {test[3]}\n" \
+                       f"Fan nomi: {test[2]}\n" \
+                       f"Sizning natijangiz: {i[5]} ball\n\n" \
+                       f"📈 Sizning javoblaringiz:\n{i[4]}\n"
+        await bot.send_message(user[2], message_text)
 
 
 @dp.callback_query_handler(text="current_users", state="*")

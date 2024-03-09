@@ -1,3 +1,5 @@
+import sqlite3
+
 from aiogram import types
 from aiogram.types import ReplyKeyboardRemove
 from keyboards.inline.start import create_test_kb, check_test_kb, menu_kb, active_test_kb
@@ -34,37 +36,41 @@ async def check_test(message: types.Message):
     test_length, all_user_answers = await match_user_answers(test_answers)
 
     test = db_manager.get_test_by_test_number(test_number)
-    quantity_questions = test[4]
+    if test is None:
+        await message.answer("Test mavjud emas!")
+        return
 
+    quantity_questions = test[4]
     if test[7] == 0:
         await message.answer(f"Test yakunlangan!")
         return
-    if db_manager.is_user_test_connection_exists(user_id=message.from_user.id, test_id=test[0]):
-        await message.answer(f"Testni bir marta topshirgansiz!")
-        return
+
     if test_length != quantity_questions:
         await message.answer(f"Testlar soni mos kelmadi!")
         return
 
     correct_answers, total_score, persentage = await calculate_score(quantity_questions, test[5], all_user_answers)
-    user = db_manager.get_user_by_full_name(full_name)
+    db_manager.update_user_full_name(message.from_user.id, full_name)
+    user = db_manager.get_user_by_user_id(message.from_user.id)
+
+    if user is None:
+        db_manager.add_user(full_name, message.from_user.id)
+        user = db_manager.get_user_by_user_id(message.from_user.id)
+
     try:
         db_manager.add_user_test_connection(user[0], test[0], test_answers, correct_answers, total_score, persentage)
+    except sqlite3.IntegrityError:
+        await message.answer("Testni yuborganingiz uchun rahmat! Lekin siz testni qayta yubora olmaysiz!")
+        return
 
-        text_message = f"👤 Foydalanuvchi:\n" \
-                       f"    {full_name}\n\n" \
-                       f"    📚 Fan: {test[2]}\n" \
-                       f"    📖 Test kodi: {test[3]}\n" \
-                       f"    ✏️ Jami savollar soni: {quantity_questions} ta\n" \
-                       f"    ✅ To'g'ri javoblar soni: {total_score}\n" \
-                       f"    📊 To'plangan ball: {total_score} ball\n" \
-                       f"    🔣 Foiz : {persentage} %\n" \
-                       f"    --------------------------------\n" \
-                       f"    🕐 Sana, vaqt: {message.date}"
-
-        await message.answer(text_message, reply_markup=ReplyKeyboardRemove())
-
-    except:
-        await message.answer("Siz bu testni topshirgansiz. Qayta jo'natish mumkin emas!", reply_markup=ReplyKeyboardRemove())
-
-
+    text_message = f"👤 Foydalanuvchi:\n" \
+                   f"    {full_name}\n\n" \
+                   f"    📚 Fan: {test[2]}\n" \
+                   f"    📖 Test kodi: {test[3]}\n" \
+                   f"    ✏️ Jami savollar soni: {quantity_questions} ta\n" \
+                   f"    ✅ To'g'ri javoblar soni: {total_score}\n" \
+                   f"    📊 To'plangan ball: {total_score} ball\n" \
+                   f"    🔣 Foiz : {persentage} %\n" \
+                   f"    --------------------------------\n" \
+                   f"    🕐 Sana, vaqt: {message.date}"
+    await message.answer(text_message, reply_markup=ReplyKeyboardRemove())
