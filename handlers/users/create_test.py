@@ -50,15 +50,17 @@ async def create_test(message: types.Message, state: FSMContext):
     await state.update_data(active_test_number=new_test[3])
     await TestCreationStates.next()
 
+    documentation = (f"Testda qatnashuvchilar quyidagi ko'rinishda javob yuborishlari mumkin:\n\n"
+                     f"{new_test[3]}*Ism Familiya*to'g'ri javoblar({new_test[4]}ta*#")
+
     text_message = f"Test yaratildi!\n\n" \
                    f"👤 O'qituvchi: {new_test[1]}\n" \
                    f"📚 Fan: {new_test[2]}\n\n" \
                    f"📕 Test raqami: {new_test[3]}\n" \
-                   f"🔢 Testlar soni: {new_test[4]}\n" \
-                   f"📝 Test javoblari: {new_test[5]}\n" \
-                   f"📊 Maksimal ball: {new_test[6]}\n"
+                   f"🔢 Savollar soni: {new_test[4]}\n" \
+                   f"📊 Maksimal ball: {new_test[6]}\n\n" \
 
-    await message.answer(text_message, reply_markup=active_test_kb)
+    await message.answer(text_message+documentation, reply_markup=active_test_kb)
 
 
 @dp.callback_query_handler(text="finish_test", state=TestCreationStates.is_test_active)
@@ -79,6 +81,15 @@ async def finish_test(call: types.CallbackQuery, state: FSMContext):
                        f"Sizning natijangiz: {i[5]} ball\n\n" \
                        f"📈 Sizning javoblaringiz:\n{i[4]}\n"
         await bot.send_message(user[2], message_text)
+
+    checked_users.sort(key=lambda x: x[5], reverse=True)
+
+    message_text_for_teacher = f"❗ Test yakunlandi!\n\n" \
+                               f"Topshirgan foydalanuvchilar:\n"
+    for i in range(len(checked_users)):
+        user = db_manager.get_user_by_id(checked_users[i][1])
+        message_text_for_teacher += f"{i + 1}. {user[1]} - {checked_users[i][5]} ball\n"
+        await call.answer(message_text_for_teacher)
 
 
 @dp.callback_query_handler(text="current_users", state="*")
