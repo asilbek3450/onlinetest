@@ -129,3 +129,9 @@ dmypy.json
 .pyre/
 .idea/*
 .env
+
+*.db
+*.sqlite3
+online_test.db
+.register_webhook.py
+register_webhook.py

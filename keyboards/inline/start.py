@@ -14,13 +14,20 @@ back_to_menu = types.InlineKeyboardButton(text="🔙 Orqaga", callback_data="bac
 
 create_test_kb = types.InlineKeyboardMarkup(row_width=2, inline_keyboard=[
     [
-        types.InlineKeyboardButton(text="✅ Ballik test", callback_data="create_test_with_score"),
+        # types.InlineKeyboardButton(text="✅ Ballik test", callback_data="create_test_with_score"),
         back_to_menu
     ]
 ])
+
+active_test_kb = types.InlineKeyboardMarkup(row_width=2, inline_keyboard=[
+    [
+        types.InlineKeyboardButton(text="Joriy holat", callback_data="current_users"),
+        types.InlineKeyboardButton(text="Yakunlash", callback_data="finish_test")
+    ]
+])
+
 check_test_kb = types.InlineKeyboardMarkup(row_width=2, inline_keyboard=[
     [
-        types.InlineKeyboardButton(text="✅ Ballik test", callback_data="check_test_with_score"),
         back_to_menu
     ]
 ])

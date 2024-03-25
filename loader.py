@@ -7,4 +7,4 @@ from utils.db_api.database import DatabaseManager
 bot = Bot(token=config.BOT_TOKEN, parse_mode=types.ParseMode.HTML)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
-db_manager = DatabaseManager('online_test.db')
+db_manager = DatabaseManager('my_test.db')
