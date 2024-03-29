@@ -89,15 +89,48 @@ async def finish_test(call: types.CallbackQuery, state: FSMContext):
                                f"To'g'ri javoblar:\n" \
                                f"{test[5]}\n\n" \
                                f"✅ Natijalar:\n"
+    # if checked_users:
+    #     checked_users.sort(key=lambda x: x[5], reverse=True)
+    #     for i in range(len(checked_users)):
+    #         user = db_manager.get_user_by_id(checked_users[i][1])
+    #         message_text_for_teacher += f"{i + 1}. {user[1]} - {checked_users[i][5]} ball\n"
+    #         await bot.send_message(call.from_user.id, message_text_for_teacher)
+    # else:
+    #     message_text_for_teacher += f"Test topshirgan foydalanuvchilar topilmadi\n"
+    #     await bot.send_message(call.from_user.id, message_text_for_teacher)
+
     if checked_users:
         checked_users.sort(key=lambda x: x[5], reverse=True)
+        # if score is equal, sort by time and top three users might be more than three
+        top_three = {}  # {position: [user, user if score is equal, ...]}
+        others = []
+        position = 1
         for i in range(len(checked_users)):
             user = db_manager.get_user_by_id(checked_users[i][1])
-            message_text_for_teacher += f"{i + 1}. {user[1]} - {checked_users[i][5]} ball\n"
-            await bot.send_message(call.from_user.id, message_text_for_teacher)
+            if position == 4:
+                break
+            elif i == 0:
+                top_three[position] = [user]
+            elif checked_users[i][5] == checked_users[i - 1][5]:
+                top_three[position].append(user)
+            else:
+                position += 1
+                top_three[position] = [user]
+        for i in range(3, len(checked_users)):
+            user = db_manager.get_user_by_id(checked_users[i][1])
+            others.append(user)
+        for i in top_three:
+            for j in top_three[i]:
+                if i == 1:
+                    message_text_for_teacher += f"{i}. 🥇 "
+                elif i == 2:
+                    message_text_for_teacher += f"{i}. 🥈 "
+                elif i == 3:
+                    message_text_for_teacher += f"{i}. 🥉 "
+                message_text_for_teacher += f"{j[1]} - {checked_users[i - 1][5]} ball\n"
     else:
         message_text_for_teacher += f"Test topshirgan foydalanuvchilar topilmadi\n"
-        await bot.send_message(call.from_user.id, message_text_for_teacher)
+    await bot.send_message(call.from_user.id, message_text_for_teacher)
 
 
 @dp.callback_query_handler(text="current_users", state="*")
