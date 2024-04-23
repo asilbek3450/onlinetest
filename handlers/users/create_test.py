@@ -14,13 +14,13 @@ class TestCreationStates(StatesGroup):
     is_test_active = State()
 
 
-@dp.callback_query_handler(text="create_test")
+@dp.callback_query_handler(text="create_test", state="*")
 async def create_test(call: types.CallbackQuery):
     documentation = """👇👇👇 Yo'riqnoma✅
 
 👇Test yaratish uchun:
 
-test*Ism familiya*Fan nomi*to'g'ri javoblar
+test*Ism familiya*Fan nomi*to'g'ri javoblar*#
 
 ko`rinishida yuboring‼️
 
@@ -31,11 +31,9 @@ yoki
 test*Aliyev Ali*Matematika*1a2d3c4a5b...*#
 """
     await call.message.edit_text(documentation, reply_markup=create_test_kb)
-    await TestCreationStates.active_test_number.set()
 
 
-@dp.message_handler(regexp=r"test\*([A-Za-z]+ [A-Za-z]+)\*([A-Za-z]+[0-9]*)\*([A-Za-z\d]+)\*#",
-                    state=TestCreationStates.active_test_number)
+@dp.message_handler(regexp=r"test\*([A-Za-z]+ [A-Za-z]+)\*([A-Za-z]+[0-9]*)\*([A-Za-z\d]+)\*#")
 async def create_test(message: types.Message, state: FSMContext):
     full_name, subject, user_answers = await regex_create_test(message.text)
     quantity_questions, all_answers = await match_user_answers(user_answers)
@@ -48,7 +46,7 @@ async def create_test(message: types.Message, state: FSMContext):
     db_manager.add_test(full_name, subject, test_number, quantity_questions, all_answers_str, total_score, status=True)
     new_test = db_manager.get_test_by_test_number(test_number)
     await state.update_data(active_test_number=new_test[3])
-    await TestCreationStates.next()
+    await TestCreationStates.is_test_active.set()
 
     documentation = (f"Testda qatnashuvchilar quyidagi ko'rinishda javob yuborishlari mumkin:\n\n"
                      f"{new_test[3]}*Ism Familiya*abcde... ({new_test[4]}ta)\n"

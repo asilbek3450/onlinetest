@@ -12,3 +12,5 @@ CHANNEL_ID = env.str("CHANNEL_ID")
 CHANNEL = [
     {'name': "Channel 🌐", "url": CHANNEL_URL, "id": CHANNEL_ID},
 ]
+
+WEBAPP_HOST = env.str("WEBAPP_HOST")

@@ -14,7 +14,7 @@ back_to_menu = types.InlineKeyboardButton(text="🔙 Orqaga", callback_data="bac
 
 create_test_kb = types.InlineKeyboardMarkup(row_width=2, inline_keyboard=[
     [
-        # types.InlineKeyboardButton(text="✅ Ballik test", callback_data="create_test_with_score"),
+        types.InlineKeyboardButton(text="✅ Ballik test", callback_data="create_test_with_score"),
         back_to_menu
     ]
 ])
